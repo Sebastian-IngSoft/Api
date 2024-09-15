@@ -12,7 +12,7 @@ class Category extends Model
 
     protected $fillable = ['name', 'slug'];
     protected $allowIncluded = ['posts', 'posts.user'];
-
+    protected $allowFilter = ['id','name', 'slug'];
     // Relación uno a muchos
     public function posts()
     {
@@ -32,7 +32,7 @@ class Category extends Model
     public function scopeIncluded(Builder $query)
     {
         //si no hay parametro included
-        if (empty([$this->allowIncluded,request('included')])) {
+        if (empty($this->allowIncluded) || empty(request('included'))) {
             return;
         }   
 
@@ -48,5 +48,20 @@ class Category extends Model
         // dd($allowIncluded);
         // modifica la query para que traiga las relaciones
         $query->with($relations);
+    }
+
+    public function scopeFilter(Builder $query)
+    {
+        if (empty($this->allowFilter) || empty(request('filter'))) {
+            return;
+        }
+
+        $filters = request('filter');
+        $allowFilter = collect($this->allowFilter);
+        foreach ($filters as $key => $value) {
+            if ($allowFilter->contains($key)) {
+                $query->where($key, 'LIKE', "%$value%");
+            }
+        }
     }
 }
