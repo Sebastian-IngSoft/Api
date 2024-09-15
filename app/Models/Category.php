@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -13,6 +14,7 @@ class Category extends Model
     protected $fillable = ['name', 'slug'];
     protected $allowIncluded = ['posts', 'posts.user'];
     protected $allowFilter = ['id','name', 'slug'];
+    protected $allowSort = ['id','name', 'slug'];
     // Relación uno a muchos
     public function posts()
     {
@@ -71,6 +73,40 @@ class Category extends Model
         foreach ($filters as $key => $value) {
             if ($allowFilter->contains($key)) {
                 $query->where($key, 'LIKE', "%$value%");
+            }
+        }
+    }
+    /**
+     * Scope a query to sort results based on request parameters.
+     *
+     * This scope method allows sorting of query results based on the 'sort' parameter
+     * in the request. The 'sort' parameter can contain multiple fields separated by commas.
+     * Each field can be prefixed with a '-' to indicate descending order.
+     *
+     * Common uses of the Laravel Str library:
+     * - Str::startsWith($haystack, $needles): Determine if a given string starts with a given substring.
+     * - Str::substr($string, $start, $length = null): Return the portion of the string specified by the start and length parameters.
+     * - Str::contains($haystack, $needles): Determine if a given string contains a given substring.
+     * - Str::finish($value, $cap): Ensure a string ends with a single instance of a given value.
+     * - Str::slug($title, $separator = '-'): Generate a URL-friendly "slug" from a given string.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return void
+     */
+    public function scopeSort($query){
+        if (empty($this->allowSort) || empty(request('sort'))) {
+            return;
+        }
+        $sortFields = explode(',', request('sort'));
+        $allowSort = collect($this->allowSort);
+        foreach ($sortFields as $sortField) {
+            $direction = 'asc';
+            if (Str::startsWith($sortField, '-')) {
+                $direction = 'desc';
+                $sortField = Str::substr($sortField, 1);
+            }
+            if ($allowSort->contains($sortField)) {
+                $query->orderBy($sortField, $direction);
             }
         }
     }
