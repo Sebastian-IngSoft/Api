@@ -53,7 +53,8 @@ class CategoryController extends Controller
             'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
         ]);
         $category->update($request->all());
-        return response('Category updated', 200);
+        return CategoryResource::make($category);
+
     }
 
     /**
@@ -63,6 +64,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
         $category->delete();
-        return response('Category deleted', 200);
+        return CategoryResource::make($category);
+
     }
 }
