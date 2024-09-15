@@ -93,7 +93,7 @@ class Category extends Model
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
-    public function scopeSort($query){
+    public function scopeSort(Builder $query){
         if (empty($this->allowSort) || empty(request('sort'))) {
             return;
         }
@@ -109,5 +109,13 @@ class Category extends Model
                 $query->orderBy($sortField, $direction);
             }
         }
+    }
+    public function scopeGetOrPaginate(Builder $query)
+    {
+        if(request('perPage')){
+            $perPage = intval(request('perPage'));
+            return $query->paginate($perPage);
+        }
+        return $query->get();
     }
 }
