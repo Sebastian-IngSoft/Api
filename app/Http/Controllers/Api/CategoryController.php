@@ -13,6 +13,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        //se modifica tantas veces se crea conveniente y luego ejecuta el get para obtener
         $categories = Category::included()->filter()->get();
         return response($categories, 200);
     }

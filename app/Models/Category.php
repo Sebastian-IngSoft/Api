@@ -50,6 +50,16 @@ class Category extends Model
         $query->with($relations);
     }
 
+    /**
+     * Scope a query to apply filters based on the request parameters.
+     *
+     * This scope method checks if there are any allowed filters defined in the
+     * model and if there are any filter parameters in the request. If both are
+     * present, it applies the filters to the query.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return void
+     */
     public function scopeFilter(Builder $query)
     {
         if (empty($this->allowFilter) || empty(request('filter'))) {
