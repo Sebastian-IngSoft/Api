@@ -33,9 +33,10 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        $category = Category::find($id);
+        // $category = Category:: with(['posts.user'])->findOrFail($id);
+        $category = Category::included()->findOrFail($id);
         return response($category, 200);
     }
 
