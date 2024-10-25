@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\RegisterController;
@@ -17,3 +18,4 @@ Route::post('register', [RegisterController::class,'store'])->name('api.v1.regis
 
 Route::apiResource('categories',CategoryController::class)->names('api.v1.categories'); 
 Route::apiResource('posts',PostController::class)->names('api.v1.posts');
+Route::post('login',[LoginController::class,'store'])->name('api.v1.store');
