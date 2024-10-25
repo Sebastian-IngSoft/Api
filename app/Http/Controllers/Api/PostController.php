@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -26,16 +33,22 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|max:255',
             'slug' => 'required|max:255|unique:posts',
             'extract' => 'required', 
             'body' => 'required',
             'category_id' => 'required|exists:categories,id',
-            'user_id' => 'required|exists:users,id',
-            //el exist tiene que ser plural por la tabla
+            // 'user_id' => 'required|exists:users,id',
+            // el exist tiene que ser plural por la tabla
         ]);
-        $post = Post::create($request->all());
+
+        $user = Auth::user();
+
+        $data['user_id'] = $user->id;
+
+        $post = Post::create($data);
+
         return PostResource::make($post);
 
     }
